@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Heart, Brain, BookOpen, Activity } from "lucide-react";
+import { Menu, X, Heart, Brain, BookOpen, Activity, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
@@ -43,12 +47,34 @@ const Navigation = () => {
                 </Button>
               );
             })}
-            <Button 
-              variant="default" 
-              className="ml-4 bg-gradient-primary hover:opacity-90 transition-smooth"
-            >
-              Get Started
-            </Button>
+            
+            {/* Auth buttons */}
+            {user ? (
+              <div className="flex items-center gap-3 ml-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4" />
+                  <span className="hidden lg:inline">{user.email}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={signOut}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden lg:inline">Sign Out</span>
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate("/auth")}
+                className="ml-4"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -84,12 +110,32 @@ const Navigation = () => {
                   </Button>
                 );
               })}
-              <Button 
-                variant="default" 
-                className="w-full mt-2 bg-gradient-primary"
-              >
-                Get Started
-              </Button>
+              
+              {/* Mobile Auth buttons */}
+              {user ? (
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-2 gap-2"
+                  onClick={() => {
+                    signOut();
+                    setIsOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              ) : (
+                <Button 
+                  variant="default" 
+                  className="w-full mt-2 bg-gradient-primary"
+                  onClick={() => {
+                    navigate("/auth");
+                    setIsOpen(false);
+                  }}
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         )}

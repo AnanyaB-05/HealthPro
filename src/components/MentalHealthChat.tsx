@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Send, Brain, Heart, Lightbulb, MessageCircle } from "lucide-react";
+import { Send, Brain, Heart, Lightbulb, MessageCircle, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   id: number;
@@ -15,15 +18,10 @@ interface Message {
 }
 
 const MentalHealthChat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I'm your mental health AI assistant. I'm here to provide emotional support and wellness guidance. How are you feeling today?",
-      sender: 'bot',
-      timestamp: new Date(),
-      suggestions: ["I'm feeling anxious", "I'm stressed about work", "I need motivation", "I'm feeling lonely"]
-    }
-  ]);
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,27 +34,55 @@ const MentalHealthChat = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Fetch user profile and initialize chat
+  useEffect(() => {
+    const initializeChat = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        
+        const name = profile?.full_name || "there";
+        setUserName(name);
+        
+        setMessages([{
+          id: 1,
+          text: `Hello ${name}! I'm your personal mental health AI assistant. I'm here to provide emotional support and wellness guidance specifically for you. How are you feeling today?`,
+          sender: 'bot',
+          timestamp: new Date(),
+          suggestions: ["I'm feeling anxious", "I'm stressed about work", "I need motivation", "I'm feeling lonely"]
+        }]);
+      }
+    };
+
+    if (!authLoading) {
+      initializeChat();
+    }
+  }, [user, authLoading]);
+
   const botResponses = {
     anxiety: [
-      "I understand you're feeling anxious. That's completely normal. Try the 4-7-8 breathing technique: breathe in for 4 counts, hold for 7, exhale for 8. Would you like me to guide you through some more coping strategies?",
-      "Anxiety can feel overwhelming, but you're taking a positive step by reaching out. Let's focus on what you can control right now. What's one small thing that usually makes you feel better?"
+      `I understand you're feeling anxious, ${userName}. That's completely normal. Try the 4-7-8 breathing technique: breathe in for 4 counts, hold for 7, exhale for 8. Would you like me to guide you through some more coping strategies?`,
+      `${userName}, anxiety can feel overwhelming, but you're taking a positive step by reaching out to me. Let's focus on what you can control right now. What's one small thing that usually makes you feel better?`
     ],
     stress: [
-      "Work stress is very common. Remember, it's important to set boundaries and take breaks. Have you tried any stress-reduction techniques like meditation or short walks?",
-      "I hear that work is causing you stress. Let's break this down - what specific aspect is bothering you most? Sometimes talking through it can help clarify solutions."
+      `${userName}, work stress is very common. Remember, it's important to set boundaries and take breaks. Have you tried any stress-reduction techniques like meditation or short walks?`,
+      `I hear that work is causing you stress, ${userName}. Let's break this down together - what specific aspect is bothering you most? Sometimes talking through it can help clarify solutions.`
     ],
     motivation: [
-      "Everyone needs motivation sometimes! Remember that small steps forward are still progress. What's one thing you've accomplished recently that you're proud of?",
-      "Motivation can come and go, and that's okay. Let's focus on one small, achievable goal for today. What would make you feel accomplished?"
+      `Everyone needs motivation sometimes, ${userName}! Remember that small steps forward are still progress. What's one thing you've accomplished recently that you're proud of?`,
+      `${userName}, motivation can come and go, and that's okay. Let's focus on one small, achievable goal for today. What would make you feel accomplished?`
     ],
     lonely: [
-      "Feeling lonely is difficult, but reaching out here shows your strength. Connection is so important for our wellbeing. Are there any activities or hobbies that usually help you feel more connected?",
-      "Loneliness is a human experience we all face sometimes. You're not alone in feeling this way. Have you considered joining any groups or activities related to your interests?"
+      `${userName}, feeling lonely is difficult, but reaching out here shows your strength. Connection is so important for our wellbeing. Are there any activities or hobbies that usually help you feel more connected?`,
+      `${userName}, loneliness is a human experience we all face sometimes. You're not alone in feeling this way. Have you considered joining any groups or activities related to your interests?`
     ],
     default: [
-      "Thank you for sharing that with me. Your feelings are valid. Can you tell me more about what's on your mind?",
-      "I'm here to listen and support you. Would you like to explore this feeling further or would you prefer some practical coping strategies?",
-      "It sounds like you're going through something important. Remember, seeking support is a sign of strength, not weakness."
+      `Thank you for sharing that with me, ${userName}. Your feelings are valid. Can you tell me more about what's on your mind?`,
+      `I'm here to listen and support you, ${userName}. Would you like to explore this feeling further or would you prefer some practical coping strategies?`,
+      `${userName}, it sounds like you're going through something important. Remember, seeking support is a sign of strength, not weakness.`
     ]
   };
 
@@ -120,6 +146,35 @@ const MentalHealthChat = () => {
       handleSendMessage();
     }
   };
+
+  // Show login prompt if not authenticated
+  if (!user && !authLoading) {
+    return (
+      <section id="chat" className="py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="max-w-2xl mx-auto text-center p-8">
+            <CardContent className="space-y-6">
+              <div className="mx-auto bg-gradient-secondary w-16 h-16 rounded-full flex items-center justify-center">
+                <Lock className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-2">Sign In Required</h3>
+                <p className="text-muted-foreground mb-6">
+                  Please sign in to access your personalized mental health AI assistant and get tailored support.
+                </p>
+              </div>
+              <Button 
+                onClick={() => navigate("/auth")}
+                className="bg-gradient-primary"
+              >
+                Sign In to Continue
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="chat" className="py-20 bg-background">
