@@ -34,7 +34,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "Successfully logged in.",
         });
-        navigate("/");
+        navigate("/home");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -53,7 +53,7 @@ const Auth = () => {
           title: "Account created!",
           description: "Welcome to HealthAI.",
         });
-        navigate("/");
+        navigate("/home");
       }
     } catch (error: any) {
       toast({

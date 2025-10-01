@@ -52,7 +52,7 @@ const MentalHealthChat = () => {
           text: `Hello ${name}! I'm your personal mental health AI assistant. I'm here to provide emotional support and wellness guidance specifically for you. How are you feeling today?`,
           sender: 'bot',
           timestamp: new Date(),
-          suggestions: ["I'm feeling anxious", "I'm stressed about work", "I need motivation", "I'm feeling lonely"]
+          suggestions: generateSuggestions()
         }]);
       }
     };
@@ -62,48 +62,18 @@ const MentalHealthChat = () => {
     }
   }, [user, authLoading]);
 
-  const botResponses = {
-    anxiety: [
-      `I understand you're feeling anxious, ${userName}. That's completely normal. Try the 4-7-8 breathing technique: breathe in for 4 counts, hold for 7, exhale for 8. Would you like me to guide you through some more coping strategies?`,
-      `${userName}, anxiety can feel overwhelming, but you're taking a positive step by reaching out to me. Let's focus on what you can control right now. What's one small thing that usually makes you feel better?`
-    ],
-    stress: [
-      `${userName}, work stress is very common. Remember, it's important to set boundaries and take breaks. Have you tried any stress-reduction techniques like meditation or short walks?`,
-      `I hear that work is causing you stress, ${userName}. Let's break this down together - what specific aspect is bothering you most? Sometimes talking through it can help clarify solutions.`
-    ],
-    motivation: [
-      `Everyone needs motivation sometimes, ${userName}! Remember that small steps forward are still progress. What's one thing you've accomplished recently that you're proud of?`,
-      `${userName}, motivation can come and go, and that's okay. Let's focus on one small, achievable goal for today. What would make you feel accomplished?`
-    ],
-    lonely: [
-      `${userName}, feeling lonely is difficult, but reaching out here shows your strength. Connection is so important for our wellbeing. Are there any activities or hobbies that usually help you feel more connected?`,
-      `${userName}, loneliness is a human experience we all face sometimes. You're not alone in feeling this way. Have you considered joining any groups or activities related to your interests?`
-    ],
-    default: [
-      `Thank you for sharing that with me, ${userName}. Your feelings are valid. Can you tell me more about what's on your mind?`,
-      `I'm here to listen and support you, ${userName}. Would you like to explore this feeling further or would you prefer some practical coping strategies?`,
-      `${userName}, it sounds like you're going through something important. Remember, seeking support is a sign of strength, not weakness.`
-    ]
-  };
-
-  const getResponseCategory = (message: string): keyof typeof botResponses => {
-    const lowerMessage = message.toLowerCase();
-    if (lowerMessage.includes('anxious') || lowerMessage.includes('anxiety') || lowerMessage.includes('worried')) return 'anxiety';
-    if (lowerMessage.includes('stress') || lowerMessage.includes('overwhelmed') || lowerMessage.includes('pressure')) return 'stress';
-    if (lowerMessage.includes('motivation') || lowerMessage.includes('unmotivated') || lowerMessage.includes('give up')) return 'motivation';
-    if (lowerMessage.includes('lonely') || lowerMessage.includes('alone') || lowerMessage.includes('isolated')) return 'lonely';
-    return 'default';
-  };
-
-  const generateSuggestions = (category: keyof typeof botResponses): string[] => {
-    const suggestions = {
-      anxiety: ["Tell me about breathing exercises", "How can I manage panic attacks?", "What are grounding techniques?"],
-      stress: ["Tips for work-life balance", "How to prioritize tasks", "Stress-relief activities"],
-      motivation: ["Help me set small goals", "How to build good habits", "Ways to celebrate progress"],
-      lonely: ["How to meet new people", "Building meaningful connections", "Self-care when alone"],
-      default: ["I need coping strategies", "Tell me about mindfulness", "How to improve my mood"]
-    };
-    return suggestions[category];
+  const generateSuggestions = (): string[] => {
+    const allSuggestions = [
+      "I'm feeling anxious",
+      "I'm stressed about work",
+      "I need motivation",
+      "I'm feeling lonely",
+      "How can I improve my mood?",
+      "Tell me about mindfulness",
+      "I need coping strategies"
+    ];
+    // Return 3 random suggestions
+    return allSuggestions.sort(() => Math.random() - 0.5).slice(0, 3);
   };
 
   const handleSendMessage = async (messageText?: string) => {
@@ -121,23 +91,46 @@ const MentalHealthChat = () => {
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
-      const category = getResponseCategory(text);
-      const responses = botResponses[category];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    try {
+      const conversationMessages = [...messages, userMessage].map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      }));
+
+      const { data, error } = await supabase.functions.invoke('mental-health-chat', {
+        body: { 
+          messages: conversationMessages,
+          userName 
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      const aiResponse = data.choices[0].message.content;
       
       const botMessage: Message = {
         id: Date.now() + 1,
-        text: randomResponse,
+        text: aiResponse,
         sender: 'bot',
         timestamp: new Date(),
-        suggestions: generateSuggestions(category)
+        suggestions: generateSuggestions()
       };
 
       setMessages(prev => [...prev, botMessage]);
+    } catch (error: any) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        id: Date.now() + 1,
+        text: "I'm sorry, I'm having trouble responding right now. Please try again in a moment.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -164,7 +157,7 @@ const MentalHealthChat = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate("/")}
                 className="bg-gradient-primary"
               >
                 Sign In to Continue
