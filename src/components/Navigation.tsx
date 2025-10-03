@@ -10,9 +10,9 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: "Predict", href: "#predict", icon: Activity },
-    { name: "Disease Library", href: "#library", icon: BookOpen },
-    { name: "Mental Health", href: "#chat", icon: Brain },
+    { name: "Predict", href: "/predict", icon: Activity },
+    { name: "Disease Library", href: "/disease-library", icon: BookOpen },
+    { name: "Mental Health", href: "/mental-health", icon: Brain },
   ];
 
   return (
@@ -38,9 +38,7 @@ const Navigation = () => {
                   key={item.name}
                   variant="ghost"
                   className="flex items-center space-x-2 hover:bg-primary/10 transition-smooth"
-                  onClick={() => {
-                    document.querySelector(item.href)?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  onClick={() => navigate(item.href)}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
@@ -101,7 +99,7 @@ const Navigation = () => {
                     variant="ghost"
                     className="w-full justify-start flex items-center space-x-2"
                     onClick={() => {
-                      document.querySelector(item.href)?.scrollIntoView({ behavior: 'smooth' });
+                      navigate(item.href);
                       setIsOpen(false);
                     }}
                   >

@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Brain, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-gradient-hero overflow-hidden">
       {/* Background Pattern */}
@@ -37,17 +40,16 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90 transition-smooth px-8 py-4 text-lg font-semibold"
-              onClick={() => document.querySelector('#predict')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white text-primary hover:bg-white/90 transition-smooth px-8 py-6 text-lg font-semibold rounded-xl"
+              onClick={() => navigate('/predict')}
             >
               Start Health Assessment
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               size="lg" 
-              variant="outline" 
-              className="border-white/30 text-white hover:bg-white/10 transition-smooth px-8 py-4 text-lg"
-              onClick={() => document.querySelector('#chat')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/20 transition-smooth px-8 py-6 text-lg rounded-xl"
+              onClick={() => navigate('/mental-health')}
             >
               Talk to Mental Health AI
             </Button>
