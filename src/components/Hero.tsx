@@ -37,40 +37,55 @@ const Hero = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button 
-              size="lg" 
-              className="bg-white text-primary hover:bg-white/90 transition-smooth px-8 py-6 text-lg font-semibold rounded-xl"
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            <button 
+              className="group relative px-8 py-6 bg-white text-primary font-bold text-lg rounded-2xl overflow-hidden shadow-large hover:shadow-xl transition-all duration-300 hover:scale-105"
               onClick={() => navigate('/predict')}
             >
-              Start Health Assessment
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/20 transition-smooth px-8 py-6 text-lg rounded-xl"
+              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              <span className="relative flex items-center gap-3">
+                Start Health Assessment
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
+            </button>
+            
+            <button 
+              className="group relative px-8 py-6 font-bold text-lg rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105"
               onClick={() => navigate('/mental-health')}
             >
-              Talk to Mental Health AI
-            </Button>
+              <div className="absolute inset-0 bg-white/20 backdrop-blur-md border-2 border-white/40 rounded-2xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              <span className="relative flex items-center gap-3 text-white">
+                <Brain className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                Talk to Mental Health AI
+              </span>
+            </button>
           </div>
 
           {/* Feature Icons */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <Activity className="h-12 w-12 text-white mx-auto mb-4" />
+            <div className="group bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-large cursor-pointer">
+              <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-6 transition-transform duration-300">
+                <Activity className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-white mb-2">Disease Prediction</h3>
-              <p className="text-white/80">ML algorithms predict diabetes, heart disease, and more</p>
+              <p className="text-white/80 text-sm">ML algorithms predict diabetes, heart disease, and more</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <Brain className="h-12 w-12 text-white mx-auto mb-4" />
+            
+            <div className="group bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-large cursor-pointer">
+              <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-6 transition-transform duration-300">
+                <Brain className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-white mb-2">Mental Health AI</h3>
-              <p className="text-white/80">NLP-powered chatbot for emotional support</p>
+              <p className="text-white/80 text-sm">NLP-powered chatbot for emotional support</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <Shield className="h-12 w-12 text-white mx-auto mb-4" />
+            
+            <div className="group bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-large cursor-pointer">
+              <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-6 transition-transform duration-300">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-white mb-2">Holistic Care</h3>
-              <p className="text-white/80">Complete physical and mental health platform</p>
+              <p className="text-white/80 text-sm">Complete physical and mental health platform</p>
             </div>
           </div>
         </div>
