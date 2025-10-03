@@ -14,21 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      profiles: {
+      chat_messages: {
         Row: {
-          created_at: string | null
-          full_name: string
+          created_at: string
           id: string
+          message: string
+          role: string
+          user_id: string
         }
         Insert: {
-          created_at?: string | null
-          full_name: string
-          id: string
+          created_at?: string
+          id?: string
+          message: string
+          role: string
+          user_id: string
         }
         Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          created_at: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          region: string | null
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string | null
+          full_name: string
+          gender?: string | null
+          id: string
+          region?: string | null
+        }
+        Update: {
+          age?: number | null
           created_at?: string | null
           full_name?: string
+          gender?: string | null
           id?: string
+          region?: string | null
         }
         Relationships: []
       }

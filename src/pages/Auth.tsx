@@ -13,6 +13,9 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [age, setAge] = useState("");
+  const [region, setRegion] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -42,6 +45,9 @@ const Auth = () => {
           options: {
             data: {
               full_name: fullName,
+              gender,
+              age,
+              region,
             },
             emailRedirectTo: `${window.location.origin}/`,
           },
@@ -81,17 +87,57 @@ const Auth = () => {
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-4">
             {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={!isLogin}
-                />
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Input
+                    id="gender"
+                    type="text"
+                    placeholder="Enter your gender"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="age">Age</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="Enter your age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    required={!isLogin}
+                    min="1"
+                    max="120"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="region">Region</Label>
+                  <Input
+                    id="region"
+                    type="text"
+                    placeholder="Enter your region"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+              </>
             )}
             
             <div className="space-y-2">

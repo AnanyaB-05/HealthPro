@@ -47,13 +47,32 @@ const MentalHealthChat = () => {
         const name = profile?.full_name || "there";
         setUserName(name);
         
-        setMessages([{
-          id: 1,
-          text: `Hello ${name}! I'm your personal mental health AI assistant. I'm here to provide emotional support and wellness guidance specifically for you. How are you feeling today?`,
-          sender: 'bot',
-          timestamp: new Date(),
-          suggestions: generateSuggestions()
-        }]);
+        // Load chat history
+        const { data: history } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true });
+        
+        if (history && history.length > 0) {
+          const loadedMessages: Message[] = history.map((msg, index) => ({
+            id: index + 1,
+            text: msg.message,
+            sender: msg.role === 'user' ? 'user' : 'bot',
+            timestamp: new Date(msg.created_at),
+            suggestions: msg.role === 'assistant' ? generateSuggestions() : undefined
+          }));
+          setMessages(loadedMessages);
+        } else {
+          // First time user - show welcome message
+          setMessages([{
+            id: 1,
+            text: `Hello ${name}! I'm your personal mental health AI assistant. I'm here to provide emotional support and wellness guidance specifically for you. How are you feeling today?`,
+            sender: 'bot',
+            timestamp: new Date(),
+            suggestions: generateSuggestions()
+          }]);
+        }
       }
     };
 
@@ -78,7 +97,7 @@ const MentalHealthChat = () => {
 
   const handleSendMessage = async (messageText?: string) => {
     const text = messageText || inputMessage.trim();
-    if (!text) return;
+    if (!text || !user) return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -90,6 +109,13 @@ const MentalHealthChat = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage("");
     setIsTyping(true);
+
+    // Save user message to database
+    await supabase.from('chat_messages').insert({
+      user_id: user.id,
+      message: text,
+      role: 'user'
+    });
 
     try {
       const conversationMessages = [...messages, userMessage].map(m => ({
@@ -119,6 +145,13 @@ const MentalHealthChat = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+
+      // Save bot response to database
+      await supabase.from('chat_messages').insert({
+        user_id: user.id,
+        message: aiResponse,
+        role: 'assistant'
+      });
     } catch (error: any) {
       console.error('Chat error:', error);
       const errorMessage: Message = {
