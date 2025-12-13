@@ -10,6 +10,7 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
+    { name: "Home", href: "/home", icon: Heart },
     { name: "Predict", href: "/predict", icon: Activity },
     { name: "Disease Library", href: "/disease-library", icon: BookOpen },
     { name: "Mental Health", href: "/mental-health", icon: Brain },
